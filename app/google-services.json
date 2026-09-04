@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "605268703459",
+    "project_id": "islamic-daily-companion-96e17",
+    "storage_bucket": "islamic-daily-companion-96e17.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:605268703459:android:9f568435290755eae12dd6",
+        "android_client_info": {
+          "package_name": "com.example.islamicdailycompanion"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAc-Gey2l83iJq7P1ph4BTKeGLxBm4o13Q"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
