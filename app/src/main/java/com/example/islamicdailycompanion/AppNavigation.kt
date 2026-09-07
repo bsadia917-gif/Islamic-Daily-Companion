@@ -1,4 +1,3 @@
-
 package com.example.islamicdailycompanion
 
 import androidx.compose.foundation.layout.padding
@@ -15,99 +14,85 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
-import androidx.compose.runtime.remember
 import com.google.firebase.auth.FirebaseAuth
 
 
 @Composable
 fun AppNavigation() {
 
-        val navController = rememberNavController()
+    val navController =
+        rememberNavController()
 
-        val auth = remember {
-            FirebaseAuth.getInstance()
+    val auth = remember {
+        FirebaseAuth.getInstance()
+    }
+
+    val startDestination =
+        if (auth.currentUser != null) {
+            "home"
+        } else {
+            "welcome"
         }
 
-        val startDestination =
-            if (auth.currentUser != null) {
-                "home"
-            } else {
-                "welcome"
-            }
-
-        // baqi tumhara existing code...
-
-
-
     // =====================================
-    // BOTTOM NAVIGATION ITEMS
+    // BOTTOM NAVIGATION
     // =====================================
 
-    val navItems = listOf(
+    val navItems =
+        listOf(
 
-        BottomNavItem(
-            route = "home",
-            title = "Home",
-            icon = Icons.Default.Home
-        ),
+            BottomNavItem(
+                route = "home",
+                title = "Home",
+                icon = Icons.Default.Home
+            ),
 
-        BottomNavItem(
-            route = "quran",
-            title = "Quran",
-            icon = Icons.Default.MenuBook
-        ),
+            BottomNavItem(
+                route = "quran",
+                title = "Quran",
+                icon = Icons.Default.MenuBook
+            ),
 
-        BottomNavItem(
-            route = "duas",
-            title = "Duas",
-            icon = Icons.Default.Favorite
-        ),
+            BottomNavItem(
+                route = "duas",
+                title = "Duas",
+                icon = Icons.Default.Favorite
+            ),
 
-        BottomNavItem(
-            route = "tasbeeh",
-            title = "Tasbeeh",
-            icon = Icons.Default.Notifications
-        ),
+            BottomNavItem(
+                route = "tasbeeh",
+                title = "Tasbeeh",
+                icon = Icons.Default.Notifications
+            ),
 
-        BottomNavItem(
-            route = "history",
-            title = "History",
-            icon = Icons.Default.History
+            BottomNavItem(
+                route = "history",
+                title = "History",
+                icon = Icons.Default.History
+            )
         )
-    )
-
-
-    // =====================================
-    // CURRENT DESTINATION
-    // =====================================
 
     val navBackStackEntry by
-    navController.currentBackStackEntryAsState()
+    navController
+        .currentBackStackEntryAsState()
 
     val currentDestination =
         navBackStackEntry?.destination
-
-
-    // =====================================
-    // SHOW BOTTOM BAR
-    // =====================================
 
     val showBottomBar =
         currentDestination?.route in
                 navItems.map {
                     it.route
                 }
-
-
-    // =====================================
-    // SCAFFOLD
-    // =====================================
 
     Scaffold(
 
@@ -140,9 +125,7 @@ fun AppNavigation() {
                                             .graph
                                             .startDestinationId
                                     ) {
-
-                                        saveState =
-                                            true
+                                        saveState = true
                                     }
 
                                     launchSingleTop =
@@ -156,10 +139,8 @@ fun AppNavigation() {
                             icon = {
 
                                 Icon(
-
                                     imageVector =
                                         item.icon,
-
                                     contentDescription =
                                         item.title
                                 )
@@ -180,23 +161,22 @@ fun AppNavigation() {
 
     ) { innerPadding ->
 
-
-        // =====================================
-        // NAV HOST
-        // =====================================
-
-
         NavHost(
-            navController = navController,
+            navController =
+                navController,
 
-            startDestination = startDestination,
+            startDestination =
+                startDestination,
 
-            modifier = Modifier.padding(innerPadding)
+            modifier =
+                Modifier.padding(
+                    innerPadding
+                )
         ) {
 
-            // =====================================
+            // =================================
             // WELCOME
-            // =====================================
+            // =================================
 
             composable("welcome") {
 
@@ -218,10 +198,9 @@ fun AppNavigation() {
                 )
             }
 
-
-            // =====================================
+            // =================================
             // SIGN IN
-            // =====================================
+            // =================================
 
             composable("signin") {
 
@@ -243,19 +222,16 @@ fun AppNavigation() {
                             popUpTo(
                                 "welcome"
                             ) {
-
-                                inclusive =
-                                    true
+                                inclusive = true
                             }
                         }
                     }
                 )
             }
 
-
-            // =====================================
+            // =================================
             // SIGN UP
-            // =====================================
+            // =================================
 
             composable("signup") {
 
@@ -277,21 +253,16 @@ fun AppNavigation() {
                             popUpTo(
                                 "welcome"
                             ) {
-
-                                inclusive =
-                                    true
+                                inclusive = true
                             }
                         }
                     }
                 )
             }
 
-
-
-
-            // =====================================
+            // =================================
             // HOME
-            // =====================================
+            // =================================
 
             composable("home") {
 
@@ -325,6 +296,20 @@ fun AppNavigation() {
                         )
                     },
 
+                    onQuranTrackerClick = {
+
+                        navController.navigate(
+                            "quran_tracker"
+                        )
+                    },
+
+                    onIslamicCalendarClick = {
+
+                        navController.navigate(
+                            "islamic_calendar"
+                        )
+                    },
+
                     onProfileClick = {
 
                         navController.navigate(
@@ -334,10 +319,9 @@ fun AppNavigation() {
                 )
             }
 
-
-            // =====================================
+            // =================================
             // QURAN
-            // =====================================
+            // =================================
 
             composable("quran") {
 
@@ -352,14 +336,58 @@ fun AppNavigation() {
                                 )
                             }"
                         )
+                    },
+
+                    onTrackerClick = {
+
+                        navController.navigate(
+                            "quran_tracker"
+                        )
                     }
                 )
             }
 
+            // =================================
+            // QURAN TRACKER
+            // =================================
 
-            // =====================================
+            composable("quran_tracker") {
+
+                QuranTrackerScreen(
+
+                    onContinueReading = {
+
+                        navController.navigate(
+                            "quran"
+                        )
+                    },
+
+                    onAllSurahs = {
+
+                        navController.navigate(
+                            "quran"
+                        )
+                    }
+                )
+            }
+
+            // =================================
+            // ISLAMIC CALENDAR
+            // TEMPORARY SCREEN
+            // =================================
+
+            composable("islamic_calendar") {
+
+                Text(
+                    text = "Islamic Calendar",
+                    modifier = Modifier.padding(20.dp),
+                    fontSize = 24.sp
+                )
+            }
+
+            // =================================
             // SURAH DETAILS
-            // =====================================
+            // =================================
 
             composable(
                 "surah/{surahName}"
@@ -385,10 +413,9 @@ fun AppNavigation() {
                 )
             }
 
-
-            // =====================================
+            // =================================
             // DUAS
-            // =====================================
+            // =================================
 
             composable("duas") {
 
@@ -407,10 +434,9 @@ fun AppNavigation() {
                 )
             }
 
-
-            // =====================================
+            // =================================
             // DUA DETAILS
-            // =====================================
+            // =================================
 
             composable(
                 "dua/{duaName}"
@@ -436,20 +462,18 @@ fun AppNavigation() {
                 )
             }
 
-
-            // =====================================
+            // =================================
             // TASBEEH
-            // =====================================
+            // =================================
 
             composable("tasbeeh") {
 
                 TasbeehScreen()
             }
 
-
-            // =====================================
-            // HISTORY MENU
-            // =====================================
+            // =================================
+            // HISTORY
+            // =================================
 
             composable("history") {
 
@@ -471,10 +495,9 @@ fun AppNavigation() {
                 )
             }
 
-
-            // =====================================
+            // =================================
             // TASBEEH HISTORY
-            // =====================================
+            // =================================
 
             composable(
                 "tasbeeh_history"
@@ -483,10 +506,9 @@ fun AppNavigation() {
                 TasbeehHistoryScreen()
             }
 
-
-            // =====================================
+            // =================================
             // PRAYER HISTORY
-            // =====================================
+            // =================================
 
             composable(
                 "prayer_history"
@@ -495,20 +517,18 @@ fun AppNavigation() {
                 PrayerHistoryScreen()
             }
 
-
-            // =====================================
+            // =================================
             // PRAYER
-            // =====================================
+            // =================================
 
             composable("prayer") {
 
                 PrayerScreen()
             }
 
-
-            // =====================================
+            // =================================
             // PROFILE
-            // =====================================
+            // =================================
 
             composable("profile") {
 
@@ -530,7 +550,13 @@ fun AppNavigation() {
 
                     onLogoutClick = {
 
-                        navController.navigate("welcome") {
+                        FirebaseAuth
+                            .getInstance()
+                            .signOut()
+
+                        navController.navigate(
+                            "welcome"
+                        ) {
 
                             popUpTo(0) {
                                 inclusive = true
@@ -542,20 +568,18 @@ fun AppNavigation() {
                 )
             }
 
-
-            // =====================================
+            // =================================
             // SETTINGS
-            // =====================================
+            // =================================
 
             composable("settings") {
 
                 SettingsScreen()
             }
 
-
-            // =====================================
+            // =================================
             // ABOUT
-            // =====================================
+            // =================================
 
             composable("about") {
 

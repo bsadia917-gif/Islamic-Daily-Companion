@@ -1,32 +1,34 @@
+
 package com.example.islamicdailycompanion
 
 import android.content.Context
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import java.text.SimpleDateFormat
+import java.util.Calendar
 import java.util.Date
 import java.util.Locale
 
@@ -42,86 +44,31 @@ fun TasbeehHistoryScreen() {
         )
     }
 
-    val today = SimpleDateFormat(
-        "dd-MM-yyyy",
-        Locale.getDefault()
-    ).format(Date())
-
-    // Today's counts
-    var subhanAllah by remember {
-        mutableStateOf(
-            preferences.getInt(
-                "${today}_SubhanAllah_total",
-                0
-            )
-        )
-    }
-
-    var alhamdulillah by remember {
-        mutableStateOf(
-            preferences.getInt(
-                "${today}_Alhamdulillah_total",
-                0
-            )
-        )
-    }
-
-    var allahuAkbar by remember {
-        mutableStateOf(
-            preferences.getInt(
-                "${today}_Allahu Akbar_total",
-                0
-            )
-        )
-    }
-
-    var duroodShareef by remember {
-        mutableStateOf(
-            preferences.getInt(
-                "${today}_Durood Shareef_total",
-                0
-            )
-        )
-    }
-
-    val totalToday =
-        subhanAllah +
-                alhamdulillah +
-                allahuAkbar +
-                duroodShareef
-
-    /*
-     * =====================================
-     * HISTORY DATA
-     * =====================================
-     *
-     * Hum last 30 days check kar rahe hain.
-     *
-     * Har date ka:
-     * SubhanAllah
-     * Alhamdulillah
-     * Allahu Akbar
-     * Durood Shareef
-     *
-     * separately save hai.
-     */
+    // =====================================
+    // DATE FORMAT
+    // =====================================
 
     val dateFormat = SimpleDateFormat(
         "dd-MM-yyyy",
         Locale.getDefault()
     )
 
+    val today = dateFormat.format(Date())
+
+    // =====================================
+    // LAST 5 DAYS
+    // =====================================
+
     val historyDates = remember {
 
         val dates = mutableListOf<String>()
 
-        for (i in 0 until 30) {
+        for (i in 0 until 5) {
 
-            val calendar =
-                java.util.Calendar.getInstance()
+            val calendar = Calendar.getInstance()
 
             calendar.add(
-                java.util.Calendar.DAY_OF_YEAR,
+                Calendar.DAY_OF_YEAR,
                 -i
             )
 
@@ -135,6 +82,79 @@ fun TasbeehHistoryScreen() {
         dates
     }
 
+    // =====================================
+    // DHIKR NAMES
+    // =====================================
+
+    val duroodName = "Durood Shareef"
+    val subhanAllahName = "SubhanAllah"
+    val alhamdulillahName = "Alhamdulillah"
+    val allahuAkbarName = "Allahu Akbar"
+    val astaghfirullahName = "Astaghfirullah"
+
+    // =====================================
+    // GET COUNT
+    // =====================================
+
+    fun getCount(
+        date: String,
+        dhikr: String
+    ): Int {
+
+        return preferences.getInt(
+            "${date}_${dhikr}_total",
+            0
+        )
+    }
+
+    // =====================================
+    // 5-DAY TOTALS
+    // =====================================
+
+    val totalDurood = historyDates.sumOf { date ->
+
+        getCount(
+            date,
+            duroodName
+        )
+    }
+
+    val totalSubhanAllah = historyDates.sumOf { date ->
+
+        getCount(
+            date,
+            subhanAllahName
+        )
+    }
+
+    val totalAlhamdulillah = historyDates.sumOf { date ->
+
+        getCount(
+            date,
+            alhamdulillahName
+        )
+    }
+
+    val totalAllahuAkbar = historyDates.sumOf { date ->
+
+        getCount(
+            date,
+            allahuAkbarName
+        )
+    }
+
+    val totalAstaghfirullah = historyDates.sumOf { date ->
+
+        getCount(
+            date,
+            astaghfirullahName
+        )
+    }
+
+    // =====================================
+    // UI
+    // =====================================
+
     Column(
 
         modifier = Modifier
@@ -147,10 +167,7 @@ fun TasbeehHistoryScreen() {
                     )
                 )
             )
-            .verticalScroll(
-                rememberScrollState()
-            )
-            .padding(20.dp),
+            .padding(16.dp),
 
         horizontalAlignment =
             Alignment.CenterHorizontally
@@ -162,7 +179,8 @@ fun TasbeehHistoryScreen() {
 
         Text(
             text = "📊 Tasbeeh History",
-            fontSize = 30.sp
+            fontSize = 30.sp,
+            fontWeight = FontWeight.Bold
         )
 
         Spacer(
@@ -170,26 +188,44 @@ fun TasbeehHistoryScreen() {
         )
 
         Text(
-            text = "Your Dhikr Record",
-            fontSize = 18.sp
+            text = "Last 5 Days",
+            fontSize = 17.sp
         )
 
         Spacer(
-            modifier = Modifier.height(20.dp)
+            modifier = Modifier.height(18.dp)
         )
 
         // =====================================
-        // TODAY
+        // TODAY CARD
         // =====================================
 
+        val todayTotal =
+            getCount(today, duroodName) +
+                    getCount(today, subhanAllahName) +
+                    getCount(today, alhamdulillahName) +
+                    getCount(today, allahuAkbarName) +
+                    getCount(today, astaghfirullahName)
+
         Card(
-            modifier = Modifier.fillMaxWidth()
+
+            modifier =
+                Modifier.width(180.dp),
+
+            shape =
+                RoundedCornerShape(20.dp),
+
+            colors =
+                CardDefaults.cardColors(
+                    containerColor =
+                        Color.White
+                )
         ) {
 
             Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(18.dp),
+
+                modifier =
+                    Modifier.padding(16.dp),
 
                 horizontalAlignment =
                     Alignment.CenterHorizontally
@@ -197,291 +233,463 @@ fun TasbeehHistoryScreen() {
 
                 Text(
                     text = "Today",
-                    fontSize = 20.sp
+                    fontSize = 18.sp,
+                    fontWeight = FontWeight.SemiBold
                 )
 
                 Spacer(
-                    modifier = Modifier.height(5.dp)
+                    modifier =
+                        Modifier.height(4.dp)
                 )
 
                 Text(
                     text = today,
-                    fontSize = 16.sp
-                )
-            }
-        }
-
-        Spacer(
-            modifier = Modifier.height(15.dp)
-        )
-
-        // =====================================
-        // TODAY TOTAL
-        // =====================================
-
-        Card(
-            modifier = Modifier.fillMaxWidth()
-        ) {
-
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(20.dp),
-
-                horizontalAlignment =
-                    Alignment.CenterHorizontally
-            ) {
-
-                Text(
-                    text = "Total Dhikr Today",
-                    fontSize = 19.sp
+                    fontSize = 14.sp
                 )
 
                 Spacer(
-                    modifier = Modifier.height(5.dp)
+                    modifier =
+                        Modifier.height(6.dp)
                 )
 
                 Text(
-                    text = "$totalToday times",
-                    fontSize = 32.sp
+                    text = "$todayTotal times",
+                    fontSize = 23.sp,
+                    fontWeight = FontWeight.Bold
                 )
             }
         }
 
         Spacer(
-            modifier = Modifier.height(18.dp)
+            modifier =
+                Modifier.height(20.dp)
         )
 
         // =====================================
-        // TODAY'S SEPARATE COUNTERS
-        // =====================================
-
-        HistoryCard(
-            title = "SubhanAllah",
-            count = subhanAllah
-        )
-
-        Spacer(
-            modifier = Modifier.height(10.dp)
-        )
-
-        HistoryCard(
-            title = "Alhamdulillah",
-            count = alhamdulillah
-        )
-
-        Spacer(
-            modifier = Modifier.height(10.dp)
-        )
-
-        HistoryCard(
-            title = "Allahu Akbar",
-            count = allahuAkbar
-        )
-
-        Spacer(
-            modifier = Modifier.height(10.dp)
-        )
-
-        HistoryCard(
-            title = "Durood Shareef",
-            count = duroodShareef
-        )
-
-        Spacer(
-            modifier = Modifier.height(25.dp)
-        )
-
-        // =====================================
-        // PREVIOUS DAYS
+        // DAILY RECORD TITLE
         // =====================================
 
         Text(
-            text = "📅 Previous Days",
-            fontSize = 22.sp
+            text = "📅 Daily Record",
+            fontSize = 22.sp,
+            fontWeight = FontWeight.Bold
         )
 
         Spacer(
-            modifier = Modifier.height(12.dp)
+            modifier =
+                Modifier.height(12.dp)
         )
 
-        historyDates.forEach { date ->
+        // =====================================
+        // HORIZONTAL SCROLL TABLE
+        // =====================================
 
-            val subhan =
-                preferences.getInt(
-                    "${date}_SubhanAllah_total",
-                    0
-                )
+        Row(
 
-            val alhamdulillahCount =
-                preferences.getInt(
-                    "${date}_Alhamdulillah_total",
-                    0
-                )
+            modifier =
+                Modifier
+                    .fillMaxSize()
+                    .horizontalScroll(
+                        rememberScrollState()
+                    )
+        ) {
 
-            val allahuAkbarCount =
-                preferences.getInt(
-                    "${date}_Allahu Akbar_total",
-                    0
-                )
+            Column {
 
-            val durood =
-                preferences.getInt(
-                    "${date}_Durood Shareef_total",
-                    0
-                )
+                // =================================
+                // HEADER ROW
+                // =================================
 
-            val dayTotal =
-                subhan +
-                        alhamdulillahCount +
-                        allahuAkbarCount +
-                        durood
+                Row(
 
-            /*
-             * Empty days show nahi karenge.
-             */
-            if (dayTotal > 0) {
-
-                Card(
                     modifier =
-                        Modifier.fillMaxWidth()
+                        Modifier.background(
+                            Color(0xFF2E7D32),
+                            RoundedCornerShape(
+                                topStart = 14.dp,
+                                topEnd = 14.dp
+                            )
+                        ),
+
+                    verticalAlignment =
+                        Alignment.CenterVertically
                 ) {
 
-                    Column(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(16.dp)
-                    ) {
+                    HistoryHeaderCell(
+                        text = "Date"
+                    )
 
-                        Text(
-                            text = "📅 $date",
-                            fontSize = 19.sp
-                        )
+                    HistoryHeaderCell(
+                        text = "Durood\nShareef"
+                    )
 
-                        Spacer(
-                            modifier =
-                                Modifier.height(10.dp)
-                        )
+                    HistoryHeaderCell(
+                        text = "Subhan\nAllah"
+                    )
 
-                        HistoryRow(
-                            title = "SubhanAllah",
-                            count = subhan
-                        )
+                    HistoryHeaderCell(
+                        text = "Alhamdu\nlillah"
+                    )
 
-                        HistoryRow(
-                            title = "Alhamdulillah",
-                            count =
-                                alhamdulillahCount
-                        )
+                    HistoryHeaderCell(
+                        text = "Allahu\nAkbar"
+                    )
 
-                        HistoryRow(
-                            title = "Allahu Akbar",
-                            count =
-                                allahuAkbarCount
-                        )
-
-                        HistoryRow(
-                            title = "Durood Shareef",
-                            count = durood
-                        )
-
-                        Spacer(
-                            modifier =
-                                Modifier.height(6.dp)
-                        )
-
-                        HistoryRow(
-                            title = "Total",
-                            count = dayTotal
-                        )
-                    }
+                    HistoryHeaderCell(
+                        text = "Astaghfi\nrullah"
+                    )
                 }
 
-                Spacer(
-                    modifier =
-                        Modifier.height(10.dp)
+                // =================================
+                // 5 DAYS
+                // =================================
+
+                historyDates.forEach { date ->
+
+                    val durood =
+                        getCount(
+                            date,
+                            duroodName
+                        )
+
+                    val subhanAllah =
+                        getCount(
+                            date,
+                            subhanAllahName
+                        )
+
+                    val alhamdulillah =
+                        getCount(
+                            date,
+                            alhamdulillahName
+                        )
+
+                    val allahuAkbar =
+                        getCount(
+                            date,
+                            allahuAkbarName
+                        )
+
+                    val astaghfirullah =
+                        getCount(
+                            date,
+                            astaghfirullahName
+                        )
+
+                    HistoryDataRow(
+
+                        date = date,
+
+                        durood =
+                            durood,
+
+                        subhanAllah =
+                            subhanAllah,
+
+                        alhamdulillah =
+                            alhamdulillah,
+
+                        allahuAkbar =
+                            allahuAkbar,
+
+                        astaghfirullah =
+                            astaghfirullah
+                    )
+                }
+
+                // =================================
+                // TOTAL ROW
+                // =================================
+
+                HistoryTotalRow(
+
+                    totalDurood =
+                        totalDurood,
+
+                    totalSubhanAllah =
+                        totalSubhanAllah,
+
+                    totalAlhamdulillah =
+                        totalAlhamdulillah,
+
+                    totalAllahuAkbar =
+                        totalAllahuAkbar,
+
+                    totalAstaghfirullah =
+                        totalAstaghfirullah
                 )
             }
         }
 
         Spacer(
-            modifier = Modifier.height(20.dp)
+            modifier =
+                Modifier.height(15.dp)
+        )
+
+        Text(
+            text =
+                "Total = separate total for each Dhikr",
+
+            fontSize =
+                13.sp,
+
+            color =
+                Color.Gray
         )
     }
 }
 
 
 // =====================================
-// HISTORY CARD
+// HEADER CELL
 // =====================================
 
 @Composable
-fun HistoryCard(
-    title: String,
-    count: Int
+fun HistoryHeaderCell(
+    text: String
 ) {
 
-    Card(
-        modifier = Modifier.fillMaxWidth()
-    ) {
+    Text(
 
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(18.dp),
+        text = text,
 
-            horizontalArrangement =
-                Arrangement.SpaceBetween,
+        modifier =
+            Modifier
+                .width(110.dp)
+                .padding(
+                    vertical = 12.dp,
+                    horizontal = 5.dp
+                ),
 
-            verticalAlignment =
-                Alignment.CenterVertically
-        ) {
+        color =
+            Color.White,
 
-            Text(
-                text = title,
-                fontSize = 19.sp
-            )
+        fontSize =
+            13.sp,
 
-            Text(
-                text = "$count times",
-                fontSize = 25.sp
-            )
-        }
-    }
+        fontWeight =
+            FontWeight.Bold,
+
+        textAlign =
+            TextAlign.Center
+    )
 }
 
 
 // =====================================
-// HISTORY ROW
+// DATA ROW
 // =====================================
 
 @Composable
-fun HistoryRow(
-    title: String,
-    count: Int
+fun HistoryDataRow(
+
+    date: String,
+
+    durood: Int,
+
+    subhanAllah: Int,
+
+    alhamdulillah: Int,
+
+    allahuAkbar: Int,
+
+    astaghfirullah: Int
 ) {
 
     Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(
-                vertical = 5.dp
+
+        modifier =
+            Modifier.background(
+                Color.White
             ),
 
-        horizontalArrangement =
-            Arrangement.SpaceBetween
+        verticalAlignment =
+            Alignment.CenterVertically
     ) {
 
-        Text(
-            text = title,
-            fontSize = 16.sp
+        HistoryDataCell(
+            text = date
         )
 
-        Text(
-            text = "$count times",
-            fontSize = 16.sp
+        HistoryDataCell(
+            text =
+                durood.toString()
+        )
+
+        HistoryDataCell(
+            text =
+                subhanAllah.toString()
+        )
+
+        HistoryDataCell(
+            text =
+                alhamdulillah.toString()
+        )
+
+        HistoryDataCell(
+            text =
+                allahuAkbar.toString()
+        )
+
+        HistoryDataCell(
+            text =
+                astaghfirullah.toString()
         )
     }
 }
 
+
+// =====================================
+// TOTAL ROW
+// =====================================
+
+@Composable
+fun HistoryTotalRow(
+
+    totalDurood: Int,
+
+    totalSubhanAllah: Int,
+
+    totalAlhamdulillah: Int,
+
+    totalAllahuAkbar: Int,
+
+    totalAstaghfirullah: Int
+) {
+
+    Row(
+
+        modifier =
+            Modifier.background(
+                Color(0xFFC8E6C9),
+                RoundedCornerShape(
+                    bottomStart = 14.dp,
+                    bottomEnd = 14.dp
+                )
+            ),
+
+        verticalAlignment =
+            Alignment.CenterVertically
+    ) {
+
+        // =================================
+        // TOTAL UNDER DATE
+        // =================================
+
+        HistoryTotalCell(
+            text = "TOTAL"
+        )
+
+        // =================================
+        // DUROOD TOTAL
+        // =================================
+
+        HistoryTotalCell(
+            text =
+                totalDurood.toString()
+        )
+
+        // =================================
+        // SUBHANALLAH TOTAL
+        // =================================
+
+        HistoryTotalCell(
+            text =
+                totalSubhanAllah.toString()
+        )
+
+        // =================================
+        // ALHAMDULILLAH TOTAL
+        // =================================
+
+        HistoryTotalCell(
+            text =
+                totalAlhamdulillah.toString()
+        )
+
+        // =================================
+        // ALLAHU AKBAR TOTAL
+        // =================================
+
+        HistoryTotalCell(
+            text =
+                totalAllahuAkbar.toString()
+        )
+
+        // =================================
+        // ASTAGHFIRULLAH TOTAL
+        // =================================
+
+        HistoryTotalCell(
+            text =
+                totalAstaghfirullah.toString()
+        )
+    }
+}
+
+
+// =====================================
+// DATA CELL
+// =====================================
+
+@Composable
+fun HistoryDataCell(
+    text: String
+) {
+
+    Text(
+
+        text = text,
+
+        modifier =
+            Modifier
+                .width(110.dp)
+                .padding(
+                    vertical = 12.dp,
+                    horizontal = 5.dp
+                ),
+
+        fontSize =
+            14.sp,
+
+        textAlign =
+            TextAlign.Center
+    )
+}
+
+
+// =====================================
+// TOTAL CELL
+// =====================================
+
+@Composable
+fun HistoryTotalCell(
+    text: String
+) {
+
+    Text(
+
+        text = text,
+
+        modifier =
+            Modifier
+                .width(110.dp)
+                .padding(
+                    vertical = 14.dp,
+                    horizontal = 5.dp
+                ),
+
+        fontSize =
+            15.sp,
+
+        fontWeight =
+            FontWeight.Bold,
+
+        color =
+            Color(0xFF1B5E20),
+
+        textAlign =
+            TextAlign.Center
+    )
+}
 
